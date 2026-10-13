@@ -9,7 +9,7 @@ Syzkaller programs can execute calls concurrently, so a reproducer describes the
 Build on Linux with kernel BTF enabled (`/sys/kernel/btf/vmlinux` present), the raw syscall and scheduler tracepoints, and these packages:
 
 ```sh
-sudo apt install clang llvm bpftool libbpf-dev libelf-dev pkg-config build-essential
+sudo apt install clang llvm linux-tools-common libbpf-dev libelf-dev pkg-config build-essential
 make
 ```
 

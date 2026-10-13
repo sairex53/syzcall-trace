@@ -1,0 +1,22 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm bpftool libbpf-dev libelf-dev zlib1g-dev pkg-config build-essential
+      - name: Test JSON formatter
+        run: make check
+      - name: Build eBPF collector
+        run: make

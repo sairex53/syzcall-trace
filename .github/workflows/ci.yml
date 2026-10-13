@@ -20,3 +20,20 @@ jobs:
         run: make check
       - name: Build eBPF collector
         run: make
+      - name: Smoke test eBPF tracepoints
+        run: |
+          trace_file="$RUNNER_TEMP/syzcall.jsonl"
+          sudo ./build/syzcall-trace --output "$trace_file" -- /bin/true
+          python3 - "$trace_file" <<'PY'
+          import json
+          import sys
+
+          with open(sys.argv[1], encoding="utf-8") as trace:
+              records = [json.loads(line) for line in trace]
+
+          assert any(record["type"] == "syscall" for record in records)
+          summary = records[-1]
+          assert summary["type"] == "summary"
+          assert summary["exit_code"] == 0
+          assert summary["lost_events"] == 0
+          PY

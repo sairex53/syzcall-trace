@@ -1,5 +1,3 @@
-#define _GNU_SOURCE
-
 #include <bpf/bpf.h>
 #include <bpf/libbpf.h>
 
@@ -73,6 +71,12 @@ static bool read_active_tasks(int fd, __u64 &active)
 {
     __u32 zero = 0;
     return bpf_map_lookup_elem(fd, &zero, &active) == 0;
+}
+
+static bool cancel_child(int fd)
+{
+    const char cancel = 'X';
+    return write(fd, &cancel, 1) == 1;
 }
 
 int main(int argc, char **argv)
@@ -185,8 +189,8 @@ int main(int argc, char **argv)
                             &zero, &initial_active, BPF_ANY) != 0) {
         std::cerr << "Cannot initialize active task counter: "
                   << std::strerror(errno) << '\n';
-        const char cancel = 'X';
-        (void)write(gate[1], &cancel, 1);
+        if (!cancel_child(gate[1]))
+            std::cerr << "Could not cancel child through start gate\n";
         close(gate[1]);
         (void)waitpid(child, nullptr, 0);
         ring_buffer__free(ring);
@@ -200,8 +204,8 @@ int main(int argc, char **argv)
                             &child_tid, &tracked, BPF_ANY) != 0) {
         std::cerr << "Cannot add command to the BPF filter: "
                   << std::strerror(errno) << '\n';
-        const char cancel = 'X';
-        (void)write(gate[1], &cancel, 1);
+        if (!cancel_child(gate[1]))
+            std::cerr << "Could not cancel child through start gate\n";
         close(gate[1]);
         (void)waitpid(child, nullptr, 0);
         ring_buffer__free(ring);

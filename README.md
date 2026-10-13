@@ -8,11 +8,17 @@ Syzkaller programs can execute calls concurrently, so a reproducer describes the
 
 ## Build
 
-Build on Linux with kernel BTF enabled (`/sys/kernel/btf/vmlinux` present), the raw syscall and scheduler tracepoints, and these packages:
+Build on Linux with kernel BTF enabled (`/sys/kernel/btf/vmlinux` present) and the raw syscall and scheduler tracepoints. On Ubuntu 26.04, install:
 
 ```sh
-sudo apt install clang llvm linux-tools-common linux-tools-$(uname -r) libbpf-dev libelf-dev pkg-config build-essential
+sudo apt install clang llvm bpftool libbpf-dev libelf-dev zlib1g-dev pkg-config build-essential
 make
+```
+
+On Ubuntu 24.04, install `linux-tools-common` and the tools package matching the running kernel instead of `bpftool`:
+
+```sh
+sudo apt install clang llvm linux-tools-common "linux-tools-$(uname -r)" libbpf-dev libelf-dev zlib1g-dev pkg-config build-essential
 ```
 
 The JSON formatter has a userspace-only test that can also run on macOS:

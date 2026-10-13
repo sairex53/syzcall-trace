@@ -1,5 +1,7 @@
 # syzcall-trace
 
+[![build](https://github.com/sairex53/syzcall-trace/actions/workflows/ci.yml/badge.svg)](https://github.com/sairex53/syzcall-trace/actions/workflows/ci.yml)
+
 `syzcall-trace` records the syscalls made by a command and its child processes using Linux eBPF tracepoints. It is meant for looking at a syzbot reproducer's *actual* execution: which syscall numbers ran, on which thread, when each call started, how long it took, and what return value it produced.
 
 Syzkaller programs can execute calls concurrently, so a reproducer describes the workload but not the exact schedule of a particular run. The official syzkaller documentation notes that calls may execute in parallel and some bugs depend on rare races. This tool adds a local syscall timeline without changing the reproducer.
@@ -9,7 +11,7 @@ Syzkaller programs can execute calls concurrently, so a reproducer describes the
 Build on Linux with kernel BTF enabled (`/sys/kernel/btf/vmlinux` present), the raw syscall and scheduler tracepoints, and these packages:
 
 ```sh
-sudo apt install clang llvm bpftool libbpf-dev libelf-dev pkg-config build-essential
+sudo apt install clang llvm linux-tools-common linux-tools-$(uname -r) libbpf-dev libelf-dev pkg-config build-essential
 make
 ```
 

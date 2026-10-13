@@ -33,7 +33,8 @@ Run this inside a disposable Linux VM with the syzkaller tools and reproducer al
 
 ```sh
 sudo ./build/syzcall-trace --output run.jsonl -- \
-  ./bin/linux_amd64/syz-execprog -enable=all -repeat=1 repro.syz
+    ./bin/linux_amd64/syz-execprog \
+  -executor=./bin/linux_amd64/syz-executor -enable=all -repeat=1 repro.syz
 ```
 
 The collector attaches before starting the command and uses a start gate so the first child syscall is included. It follows descendants through `sched_process_fork`, waits until tracked descendants exit, and removes task IDs on exit. The child process's normal stdout and stderr remain attached to the terminal; trace records go to the JSONL file.
